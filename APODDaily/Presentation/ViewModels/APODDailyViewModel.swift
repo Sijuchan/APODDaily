@@ -78,14 +78,6 @@ final class APODDailyViewModel: ObservableObject {
     }
 
 
-
-    func retry() {
-        debugPrint("-->Retry tapped")
-
-        let dateToLoad: Date? = autoLoad ? nil : selectedDate
-        load(date: dateToLoad)
-    }
-
     func load(date: Date?) {
         debugPrint("Starting load")
 
