@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct APODDailyApp: App {
+    private let coordinator = AppCoordinator()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            coordinator.start()
         }
     }
 }

@@ -1,0 +1,12 @@
+//
+//  Config.xcconfig
+//  APODDaily
+//
+//  Created by Siju Satheesachandran on 08/04/2026.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+
+
+API_KEY = y6bV419MmWXluY8rcuHRguCkTi05pBmotw9eER9R

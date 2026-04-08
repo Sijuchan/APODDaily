@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CDD97CE42F86A9F800195899 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = CDD97CE32F86A9F800195899 /* Config.xcconfig */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CDDAAEDC2F832BBB00148784 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,14 +28,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CDD97CE32F86A9F800195899 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		CDDAAECE2F832BBA00148784 /* APODDaily.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = APODDaily.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDDAAEDB2F832BBB00148784 /* APODDailyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = APODDailyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDDAAEE52F832BBB00148784 /* APODDailyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = APODDailyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CDD97CEB2F86B6B500195899 /* Exceptions for "APODDaily" folder in "APODDaily" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CDDAAECD2F832BBA00148784 /* APODDaily */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CDDAAED02F832BBA00148784 /* APODDaily */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CDD97CEB2F86B6B500195899 /* Exceptions for "APODDaily" folder in "APODDaily" target */,
+			);
 			path = APODDaily;
 			sourceTree = "<group>";
 		};
@@ -75,6 +93,7 @@
 		CDDAAEC52F832BBA00148784 = {
 			isa = PBXGroup;
 			children = (
+				CDD97CE32F86A9F800195899 /* Config.xcconfig */,
 				CDDAAED02F832BBA00148784 /* APODDaily */,
 				CDDAAEDE2F832BBB00148784 /* APODDailyTests */,
 				CDDAAEE82F832BBB00148784 /* APODDailyUITests */,
@@ -212,6 +231,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDD97CE42F86A9F800195899 /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +291,7 @@
 /* Begin XCBuildConfiguration section */
 		CDDAAEED2F832BBB00148784 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CDD97CE32F86A9F800195899 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -335,6 +356,7 @@
 		};
 		CDDAAEEE2F832BBB00148784 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CDD97CE32F86A9F800195899 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -400,6 +422,7 @@
 				DEVELOPMENT_TEAM = 23HPM39Z26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = APODDaily/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -433,6 +456,7 @@
 				DEVELOPMENT_TEAM = 23HPM39Z26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = APODDaily/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
