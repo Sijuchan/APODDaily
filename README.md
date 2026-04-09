@@ -25,8 +25,7 @@ https://github.com/nasa/apod-api
 - Works on iPhone and iPad
 - Supports different orientations
 - Dark Mode support
-- Dynamic Type support for accessibility
-
+- 
 ---
 
 ## Architecture
