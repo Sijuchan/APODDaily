@@ -1,7 +1,5 @@
 # APODDaily
 
-This project is a take-home assignment for the iOS Software Engineer III role at JP Morgan (Glasgow).
-
 The app uses NASA’s Astronomy Picture of the Day (APOD) API:
 https://github.com/nasa/apod-api
 
