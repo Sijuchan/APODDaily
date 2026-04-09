@@ -124,3 +124,6 @@ This project was built as a take-home exercise with a focus on:
 - Stability
 
 No confidential or third-party code has been used.
+
+
+https://github.com/user-attachments/assets/97d4fa0a-8927-403c-8fd6-8efb1950e636
