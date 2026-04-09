@@ -46,3 +46,16 @@ struct ExploreScreen: View {
         }
     }
 }
+
+
+
+#Preview {
+    NavigationStack {
+        ExploreScreen(
+            viewModel: APODDailyViewModel(
+                autoLoad: true,
+                repository: MockAPODRepository()
+            )
+        )
+    }
+}

@@ -8,7 +8,7 @@
 import Foundation
 
 
-enum APODError: LocalizedError {
+enum APODError: LocalizedError, Equatable {
     case invalidURL
     case badResponse(Int)
     case decodingFailed

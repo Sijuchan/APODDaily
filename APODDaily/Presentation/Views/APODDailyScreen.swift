@@ -144,4 +144,13 @@ struct APODDailyScreen: View {
 
 
 
-
+#Preview {
+    NavigationStack {
+        APODDailyScreen(
+            viewModel: APODDailyViewModel(
+                autoLoad: true,
+                repository: MockAPODRepository()
+            )
+        )
+    }
+}

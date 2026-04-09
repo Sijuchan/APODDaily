@@ -30,12 +30,7 @@ final class APODDailyViewModel: ObservableObject {
     private var hasLoaded = false
     private var loadTask: Task<Void, Never>?
 
-    init(
-        autoLoad: Bool,
-        repository: APODRepositoryProtocol,
-        maximumSelectableDate: Date = .now,
-        initialSelectedDate: Date = .now
-    ) {
+    init(autoLoad: Bool,repository: APODRepositoryProtocol,maximumSelectableDate: Date = .now,initialSelectedDate: Date = .now) {
         self.autoLoad = autoLoad
         self.repository = repository
         self.maximumSelectableDate = maximumSelectableDate
@@ -55,7 +50,7 @@ final class APODDailyViewModel: ObservableObject {
         debugPrint("-->> onAppear called")
 
         guard autoLoad, !hasLoaded else {
-            debugPrint("-->>Skipping auto load (already loaded or disabled)")
+            debugPrint("-->>Skipping auto load")
             return
         }
 
@@ -83,8 +78,13 @@ final class APODDailyViewModel: ObservableObject {
 
         loadTask?.cancel()
         state = .loading
-
-        let requestedDate = date.map { min($0, maximumSelectableDate) }
+       
+        let requestedDate: Date?
+        if let date {
+            requestedDate = min(date, maximumSelectableDate)
+        } else {
+            requestedDate = nil
+        }
 
         if let requestedDate {
             debugPrint("Fetching APOD for date: \(requestedDate)")

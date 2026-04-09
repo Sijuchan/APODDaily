@@ -8,187 +8,257 @@
 import XCTest
 @testable import APODDaily
 
-private func makeImageDTO(
-    date: String = "2026-04-08",
-    title: String = "Test Title",
-    explanation: String = "Test explanation.",
-    url: String = "https://example.com/image.jpg",
-    hdurl: String? = "https://example.com/hd.jpg"
-) -> APODDTO {
-    APODDTO(
-        date: date,
-        title: title,
-        explanation: explanation,
-        url: url,
-        hdurl: hdurl,
+
+ 
+final class MockAPODRepository: APODRepositoryProtocol {
+    var result: Result<APODResult, Error> = .failure(APODError.noCache)
+    var fetchCallCount = 0
+    var lastDateRequested: Date?
+ 
+    func fetchAPOD(for date: Date?) async throws -> APODResult {
+        fetchCallCount += 1
+        lastDateRequested = date
+        return try result.get()
+    }
+}
+ 
+
+ 
+extension APODDTO {
+    static let imageFixture = APODDTO(
+        date: "2021-04-01",
+        title: "Pillars of Creation",
+        explanation: "Towering pillars of gas and dust.",
+        url: "https://apod.nasa.gov/apod/image/2104/PillarsOfCreation.jpg",
+        hdurl: "https://apod.nasa.gov/apod/image/2104/PillarsOfCreation_hd.jpg",
         mediaType: "image",
         thumbnailUrl: nil
     )
-}
-
-private func makeVideoDTO(
-    date: String = "2026-04-08",
-    url: String = "https://www.youtube.com/embed/abc123",
-    thumbnailUrl: String? = "https://example.com/thumb.jpg"
-) -> APODDTO {
-    APODDTO(
-        date: date,
-        title: "Video Title",
-        explanation: "A video APOD.",
-        url: url,
+ 
+    static let videoFixture = APODDTO(
+        date: "2021-10-11",
+        title: "Halloween and the Sunflower Galaxy",
+        explanation: "A spooky video APOD.",
+        url: "https://www.youtube.com/embed/abc123",
         hdurl: nil,
         mediaType: "video",
-        thumbnailUrl: thumbnailUrl
+        thumbnailUrl: "https://img.youtube.com/vi/abc123/0.jpg"
     )
 }
-
-private func makeAPOD(title: String = "Galaxy") -> APOD {
-    APOD(
-        title: title,
-        explanation: "Far away.",
-        date: Date(),
-        media: .image(nil, URL(string: "https://example.com/img.jpg"))
+ 
+extension APOD {
+    static let imageFixture = APOD(
+        title: "Pillars of Creation",
+        explanation: "Towering pillars of gas and dust.",
+        date: APODDateFormatter.parse("2021-04-01"),
+        media: .image(nil, URL(string: "https://apod.nasa.gov/apod/image/2104/PillarsOfCreation_hd.jpg"))
+    )
+ 
+    static let videoFixture = APOD(
+        title: "Halloween and the Sunflower Galaxy",
+        explanation: "A spooky video APOD.",
+        date: APODDateFormatter.parse("2021-10-11"),
+        media: .video(
+            URL(string: "https://www.youtube.com/embed/abc123")!,
+            thumbnailURL: URL(string: "https://img.youtube.com/vi/abc123/0.jpg")
+        )
     )
 }
+ 
 
-
-
-final class APODMapperTests: XCTestCase {
-
-    func test_map_imageDTO_returnsImageMediaWithHDURL() throws {
-        let dto = makeImageDTO()
-        let imageData = Data([0xFF, 0xD8])
-
-        let apod = try APODMapper.map(dto: dto, imageData: imageData)
-
-        XCTAssertEqual(apod.title, "Test Title")
-        XCTAssertEqual(apod.explanation, "Test explanation.")
-
-        guard case .image(let data, let url) = apod.media else {
-            return XCTFail("Expected .image media")
-        }
-        XCTAssertEqual(data, imageData)
-        XCTAssertEqual(url?.absoluteString, "https://example.com/hd.jpg")
-    }
-
-    func test_map_videoDTO_returnsVideoMedia() throws {
-        let dto = makeVideoDTO()
-
-        let apod = try APODMapper.map(dto: dto, imageData: nil)
-
-        guard case .video(let videoURL, let thumbnailURL) = apod.media else {
-            return XCTFail("Expected .video media")
-        }
-        XCTAssertEqual(videoURL.absoluteString, "https://www.youtube.com/embed/abc123")
-        XCTAssertEqual(thumbnailURL?.absoluteString, "https://example.com/thumb.jpg")
-    }
-}
-
-
-
+ 
 final class APODDateFormatterTests: XCTestCase {
-
-    func test_roundTrip_parseAndFormat_isIdentity() {
-        let original = "2023-12-31"
-        let date = APODDateFormatter.parse(original)
-        let formatted = APODDateFormatter.format(date)
-
-        XCTAssertEqual(formatted, original)
+ 
+    func testFormatAndParseRoundtrip() {
+        let date = APODDateFormatter.parse("2021-04-01")
+        XCTAssertEqual(APODDateFormatter.format(date), "2021-04-01")
+    }
+ 
+    func testParseReturnsCorrectDateComponents() {
+        let date = APODDateFormatter.parse("2021-04-01")
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(secondsFromGMT: 0)!
+        XCTAssertEqual(cal.component(.year, from: date), 2021)
+        XCTAssertEqual(cal.component(.month, from: date), 4)
+        XCTAssertEqual(cal.component(.day, from: date), 1)
     }
 }
+ 
 
-
-
-private final class MockRepository: APODRepositoryProtocol {
-    enum Behaviour {
-        case success(APOD, isCached: Bool)
-        case failure(Error)
+ 
+final class APODMapperTests: XCTestCase {
+ 
+    func testMapsImageDTOCorrectly() throws {
+        let apod = try APODMapper.map(dto: .imageFixture, imageData: nil)
+        XCTAssertEqual(apod.title, "Pillars of Creation")
+        XCTAssertEqual(APODDateFormatter.format(apod.date), "2021-04-01")
+        if case .image(let data, let url) = apod.media {
+            XCTAssertNil(data)
+            XCTAssertEqual(url?.absoluteString, "https://apod.nasa.gov/apod/image/2104/PillarsOfCreation_hd.jpg")
+        } else {
+            XCTFail("Expected image media")
+        }
     }
-
-    var behaviour: Behaviour
-
-    init(_ behaviour: Behaviour) {
-        self.behaviour = behaviour
+ 
+    func testMapsVideoDTOCorrectly() throws {
+        let apod = try APODMapper.map(dto: .videoFixture, imageData: nil)
+        if case .video(let url, let thumb) = apod.media {
+            XCTAssertEqual(url.absoluteString, "https://www.youtube.com/embed/abc123")
+            XCTAssertEqual(thumb?.absoluteString, "https://img.youtube.com/vi/abc123/0.jpg")
+        } else {
+            XCTFail("Expected video media")
+        }
     }
-
-    func fetchAPOD(for date: Date?) async throws -> APODResult {
-        switch behaviour {
-        case .success(let apod, let isCached):
-            return APODResult(apod: apod, isCached: isCached)
-        case .failure(let error):
-            throw error
+ 
+    func testFallsBackToUrlWhenNoHdurl() throws {
+        let dto = APODDTO(
+            date: "2021-04-01", title: "Test", explanation: "Test",
+            url: "https://example.com/image.jpg", hdurl: nil,
+            mediaType: "image", thumbnailUrl: nil
+        )
+        let apod = try APODMapper.map(dto: dto, imageData: nil)
+        if case .image(_, let url) = apod.media {
+            XCTAssertEqual(url?.absoluteString, "https://example.com/image.jpg")
+        } else {
+            XCTFail("Expected image media")
         }
     }
 }
+ 
 
+ 
+final class APODDiskCacheTests: XCTestCase {
+ 
+    private var cache: APODDiskCache!
+ 
+    override func setUp() {
+        super.setUp()
+        cache = APODDiskCache()
+    }
+ 
+    func testSaveAndLoadRoundtripsDTO() throws {
+        try cache.save(dto: .imageFixture, image: nil, key: "cache-test-01")
+        let loaded = try cache.loadLatest()
+        XCTAssertEqual(loaded.dto.title, APODDTO.imageFixture.title)
+        XCTAssertEqual(loaded.dto.date, APODDTO.imageFixture.date)
+    }
+ 
+    func testSaveAndLoadRoundtripsImageData() throws {
+        let imageData = Data([0xFF, 0xD8, 0xFF])
+        try cache.save(dto: .imageFixture, image: imageData, key: "cache-test-02")
+        let loaded = try cache.loadLatest()
+        XCTAssertEqual(loaded.image, imageData)
+    }
+ 
+    func testLoadLatestReturnsLastWrittenEntry() throws {
+        try cache.save(dto: .imageFixture, image: nil, key: "cache-test-first")
+        let second = APODDTO(
+            date: "2021-04-02", title: "Second APOD", explanation: "Another day.",
+            url: "https://example.com/second.jpg", hdurl: nil,
+            mediaType: "image", thumbnailUrl: nil
+        )
+        try cache.save(dto: second, image: nil, key: "cache-test-second")
+        let loaded = try cache.loadLatest()
+        XCTAssertEqual(loaded.dto.title, "Second APOD")
+    }
+}
+ 
+
+ 
 @MainActor
 final class APODDailyViewModelTests: XCTestCase {
-
-    func test_load_success_transitionsToContent() async {
-        let expectedAPOD = makeAPOD(title: "Nebula")
-        let vm = APODDailyViewModel(
-            autoLoad: false,
-            repository: MockRepository(.success(expectedAPOD, isCached: false))
-        )
-
-        vm.load(date: nil)
-        await Task.yield()
-        try? await Task.sleep(nanoseconds: 100_000_000)
-
-        guard case .content(let apod, let isCached) = vm.state else {
-            return XCTFail("Expected .content")
+ 
+    private var mockRepo: MockAPODRepository!
+ 
+    override func setUp() {
+        super.setUp()
+        mockRepo = MockAPODRepository()
+    }
+ 
+    func testInitialStateIsIdleWhenAutoLoadDisabled() {
+        let vm = APODDailyViewModel(autoLoad: false, repository: mockRepo)
+        if case .idle = vm.state { } else {
+            XCTFail("Expected .idle, got \(vm.state)")
         }
-        XCTAssertEqual(apod.title, "Nebula")
-        XCTAssertFalse(isCached)
     }
-
-    func test_load_failure_transitionsToError() async {
-        let vm = APODDailyViewModel(
-            autoLoad: false,
-            repository: MockRepository(.failure(APODError.badResponse(503)))
-        )
-
-        vm.load(date: nil)
-        await Task.yield()
+ 
+    func testOnAppearTriggersNetworkLoad() async {
+        mockRepo.result = .success(APODResult(apod: .imageFixture, isCached: false))
+        let vm = APODDailyViewModel(autoLoad: true, repository: mockRepo)
+        vm.onAppear()
         try? await Task.sleep(nanoseconds: 100_000_000)
-
-        guard case .error(let message) = vm.state else {
-            return XCTFail("Expected .error")
+        XCTAssertEqual(mockRepo.fetchCallCount, 1)
+    }
+ 
+    func testOnAppearOnlyLoadsOnce() async {
+        mockRepo.result = .success(APODResult(apod: .imageFixture, isCached: false))
+        let vm = APODDailyViewModel(autoLoad: true, repository: mockRepo)
+        vm.onAppear()
+        vm.onAppear()
+        vm.onAppear()
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(mockRepo.fetchCallCount, 1)
+    }
+ 
+    func testSuccessfulLoadSetsContentState() async {
+        mockRepo.result = .success(APODResult(apod: .imageFixture, isCached: false))
+        let vm = APODDailyViewModel(autoLoad: false, repository: mockRepo)
+        vm.load(date: nil)
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        if case .content(let apod, let cached) = vm.state {
+            XCTAssertEqual(apod.title, "Pillars of Creation")
+            XCTAssertFalse(cached)
+        } else {
+            XCTFail("Expected .content, got \(vm.state)")
         }
-        XCTAssertFalse(message.isEmpty)
+    }
+ 
+    func testFailedLoadSetsErrorState() async {
+        mockRepo.result = .failure(APODError.badResponse(503))
+        let vm = APODDailyViewModel(autoLoad: false, repository: mockRepo)
+        vm.load(date: nil)
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        if case .error(let message) = vm.state {
+            XCTAssertFalse(message.isEmpty)
+        } else {
+            XCTFail("Expected .error, got \(vm.state)")
+        }
+    }
+ 
+    func testCachedResultFlagIsPreserved() async {
+        mockRepo.result = .success(APODResult(apod: .imageFixture, isCached: true))
+        let vm = APODDailyViewModel(autoLoad: false, repository: mockRepo)
+        vm.load(date: nil)
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        if case .content(_, let cached) = vm.state {
+            XCTAssertTrue(cached)
+        } else {
+            XCTFail("Expected .content, got \(vm.state)")
+        }
+    }
+ 
+    func testVideoAPODLoadsCorrectMediaType() async {
+        mockRepo.result = .success(APODResult(apod: .videoFixture, isCached: false))
+        let vm = APODDailyViewModel(autoLoad: false, repository: mockRepo)
+        vm.load(date: nil)
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        if case .content(let apod, _) = vm.state, case .video = apod.media {
+            // pass
+        } else {
+            XCTFail("Expected .content with .video media, got \(vm.state)")
+        }
+    }
+ 
+    func testLoadForwardsSelectedDateToRepository() async {
+        mockRepo.result = .success(APODResult(apod: .imageFixture, isCached: false))
+        let vm = APODDailyViewModel(autoLoad: false, repository: mockRepo)
+        let date = APODDateFormatter.parse("2021-04-01")
+        vm.load(date: date)
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(
+            mockRepo.lastDateRequested.map { APODDateFormatter.format($0) },
+            "2021-04-01"
+        )
     }
 }
-
-
-
-private final class MockCache: APODDiskCacheProtocol {
-    var savedDTO: APODDTO?
-    var savedImage: Data?
-
-    func save(dto: APODDTO, image: Data?, key: String) throws {
-        savedDTO = dto
-        savedImage = image
-    }
-
-    func loadLatest() throws -> (dto: APODDTO, image: Data?) {
-        guard let dto = savedDTO else { throw APODError.noCache }
-        return (dto, savedImage)
-    }
-}
-
-final class APODCacheFallbackTests: XCTestCase {
-
-    func test_loadLatest_afterSave_returnsMatchingDTO() throws {
-        let cache = MockCache()
-        let dto = makeImageDTO()
-        let imageData = Data([0x89, 0x50, 0x4E, 0x47])
-
-        try cache.save(dto: dto, image: imageData, key: dto.date)
-        let (loaded, loadedImage) = try cache.loadLatest()
-
-        XCTAssertEqual(loaded.date, dto.date)
-        XCTAssertEqual(loaded.title, dto.title)
-        XCTAssertEqual(loaded.mediaType, dto.mediaType)
-        XCTAssertEqual(loadedImage, imageData)
-    }
-}
+ 
