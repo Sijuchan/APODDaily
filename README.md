@@ -76,31 +76,7 @@ The app follows a simple and clean structure using:
 
 Unit tests are included to cover the main logic of the app.
 
-### What is tested
 
-**Date Formatting**
-- Ensures API date strings are parsed and formatted correctly
-
-**Mapping**
-- Verifies correct mapping of image responses
-- Verifies correct handling of video responses
-- Checks fallback when `hdurl` is missing
-
-**Disk Cache**
-- Tests saving and loading of APOD data
-- Ensures image data is cached and restored
-- Confirms latest cached entry is returned
-
-**ViewModel**
-- Verifies initial state
-- Ensures auto-load happens only once
-- Tests successful loading updates state correctly
-- Tests error handling
-- Verifies cached results are flagged correctly
-- Ensures selected date is passed correctly
-- Confirms video content is handled correctly
-
-The focus of the tests is on logic-heavy parts like mapping, caching, and state handling.
 
 ---
 
